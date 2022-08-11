@@ -75,6 +75,7 @@ resetEl.addEventListener('click', resetClickHandler);
 // creazione variabile che contiene l'elemento colors
 const colorsEl = document.querySelector('.colors');
 colorsEl.addEventListener('click', colorsClickHandler);
+// creazione palette dei colori
 for ( let i = 0; i < 54; i++ ) {
     const colorEl = document.createElement('div');
     colorEl.className = 'color';
@@ -96,12 +97,8 @@ for ( let i = 0; i < 54; i++ ) {
 
 // funzione che gestisce il click su reset
 function resetClickHandler() {
-    const xEl = document.querySelector('.x');
-    const yEl = document.querySelector('.y');
-    
-    xValue = parseInt(xEl.value.trim());
-    yValue = parseInt(yEl.value.trim());
-
+    xValue = parseInt(document.querySelector('.x').value.trim());
+    yValue = parseInt(document.querySelector('.y').value.trim());
     if ( !isNaN(xValue) && !isNaN(yValue) ) {
         gridEl.style.gridTemplateColumns = `repeat(${xValue}, 1fr)`;
         gridEl.innerHTML = '';
@@ -146,6 +143,7 @@ function drawHandler() {
         case 'rgb(238, 238, 238)':
             hoverEl.style.borderColor = '#ddd';
             break;
+        // altrimenti lo setto del colore selezionato
         default:
             hoverEl.style.borderColor = cellaBgColor;
             break;
