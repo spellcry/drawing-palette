@@ -2,7 +2,7 @@
 let colorSelectedEl;
 
 // dichiarazione variabili
-let xValue, yValue, cellaBgColor = 'black';
+let xValue, yValue, xOldValue, yOldValue, cellaBgColor = 'black';
 
 // inizializzazione array colori
 const arrayColors = [
@@ -62,15 +62,25 @@ const arrayColors = [
     '#b61435',
 ];
 
+// al change attivo o disattivo i pulsanti
+const xEl = document.querySelector('.x');
+xEl.addEventListener('keyup', btnOnOff);
+const yEl = document.querySelector('.y');
+yEl.addEventListener('keyup', btnOnOff);
+
 // creazione variabile che contiene l'elemento grid
 const gridEl = document.querySelector('.grid');
 gridEl.addEventListener('click', drawHandler);
 gridEl.addEventListener('mousedown', addMouseMoveHandler);
 gridEl.addEventListener('mouseup', removeMouseMoveHandler);
 
-// creazione variabile che contiene l'elemento reset
-const resetEl = document.querySelector('.reset');
-resetEl.addEventListener('click', resetClickHandler);
+// creazione variabile che contiene l'elemento new
+const newEl = document.querySelector('.new');
+newEl.addEventListener('click', newClickHandler);
+
+// creazione variabile che contiene l'elemento clean
+const cleanEl = document.querySelector('.clean');
+cleanEl.addEventListener('click', cleanClickHandler);
 
 // creazione variabile che contiene l'elemento colors
 const colorsEl = document.querySelector('.colors');
@@ -95,11 +105,25 @@ for ( let i = 0; i < 54; i++ ) {
     colorsEl.append(colorEl);
 }
 
-// funzione che gestisce il click su reset
-function resetClickHandler() {
-    xValue = parseInt(document.querySelector('.x').value.trim());
-    yValue = parseInt(document.querySelector('.y').value.trim());
-    if ( !isNaN(xValue) && !isNaN(yValue) ) {
+// funzione che abilita e disabilita i bottoni
+function btnOnOff() {
+    xValue = parseInt(xEl.value.trim());
+    yValue = parseInt(yEl.value.trim());
+    if( !isNaN(xValue) && !isNaN(yValue) && xValue > 0 && yValue > 0) {
+        newEl.disabled = false;
+    } else {
+        newEl.disabled = true;    
+    }
+}
+
+// funzione che gestisce il click su new
+function newClickHandler() {
+    xValue = parseInt(xEl.value.trim());
+    yValue = parseInt(yEl.value.trim());
+    xOldValue = xValue;
+    yOldValue = yValue;
+    cleanEl.disabled = true;
+    if ( !isNaN(xValue) && !isNaN(yValue) && xValue > 0 && yValue > 0 ) {
         gridEl.style.gridTemplateColumns = `repeat(${xValue}, 1fr)`;
         gridEl.innerHTML = '';
         const totCelle = xValue * yValue;
@@ -123,6 +147,33 @@ function resetClickHandler() {
     }
 }
 
+// funzione che gestisce il click su reset
+function cleanClickHandler() {
+    if ( !isNaN(xOldValue) && !isNaN(yOldValue) && xOldValue > 0 && yOldValue > 0 ) {
+        gridEl.style.gridTemplateColumns = `repeat(${xValue}, 1fr)`;
+        gridEl.innerHTML = '';
+        const totCelle = xOldValue * yOldValue;
+        for ( let i = 0; i < totCelle; i++ ) {
+            const cellaEl = document.createElement('div');
+            cellaEl.className = 'cella';
+            if ( ( i + 1) % xOldValue === 0 )
+                cellaEl.classList.add('br-0');
+            if ( Math.ceil(( i + 1 ) / xOldValue) === yOldValue )
+                cellaEl.classList.add('bb-0');
+            gridEl.append(cellaEl);
+            gridEl.classList.add('border');
+            cleanEl.disabled = true;
+        }
+    } else {
+        xOldValue = 0;
+        yOldValue = 0;
+    }
+    if ( xOldValue === 0 || yOldValue === 0 ) {
+        gridEl.classList.remove('border');
+        gridEl.innerHTML = '';
+    }
+}
+
 // funzione che aggiunge un eventlistener 'mouvemove'
 function addMouseMoveHandler() {
     gridEl.addEventListener('mousemove', drawHandler);
@@ -135,6 +186,7 @@ function removeMouseMoveHandler() {
 
 // funzione che colora la cella
 function drawHandler() {
+    let gridClean;
     const hoverEl = this.querySelector(':hover');
     hoverEl.style.backgroundColor = cellaBgColor;
     switch (cellaBgColor) {
@@ -148,6 +200,15 @@ function drawHandler() {
             hoverEl.style.borderColor = cellaBgColor;
             break;
     }
+    for(let i = 0; i < xOldValue * yOldValue; i++) {
+        if(gridEl.children[i].style.backgroundColor != '' && gridEl.children[i].style.backgroundColor != 'rgb(238, 238, 238)') {
+            gridClean = false;
+            break;
+        } else {
+            gridClean = true;
+        }
+    }
+    gridClean ? cleanEl.disabled = true : cleanEl.disabled = false;
 }
 
 // funzione che gestisce il click sui colori
